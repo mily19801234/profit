@@ -14,80 +14,49 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        :root {
-            --bg-color: #1a1a2e; --card-bg-color: #16213e; --primary-text-color: #e0e0e0;
-            --secondary-text-color: #a0a0a0; --accent-color: #03dac6; --success-color: #4caf50;
-            --danger-color: #f44336; --border-color: #0f3460; --font-family: 'Poppins', sans-serif;
-            --points-color: #ffc107; --streak-color: #ff5722;
-        }
-        html { -webkit-tap-highlight-color: transparent; }
-        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--primary-text-color); margin: 0; padding: 1rem; }
-        .view { display: none; }
-        .view.active { display: block; }
-        .container { max-width: 1200px; margin: 0 auto; display: grid; gap: 1rem; grid-template-columns: 1fr; }
-        @media (min-width: 1024px) { .container { grid-template-columns: repeat(3, 1fr); } }
-        .card { background: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.5rem; }
-        .card-header { margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-color); }
-        .card-title { font-weight: 600; font-size: 1.3rem; margin:0; }
-        .btn { display: inline-block; padding: 0.9rem 1.5rem; border: none; border-radius: 0.75rem; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-align:center; }
-        .btn.full-width { display: block; width: 100%; } .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .history-list { list-style: none; padding:0; margin:0; max-height: 300px; overflow-y: auto; }
-        .history-item { display: flex; align-items: center; padding: 0.8rem 0; border-bottom: 1px solid var(--border-color); gap: 1rem;}
-        .history-details { flex-grow: 1; }
-        .history-note { font-size: 0.8rem; color: var(--secondary-text-color); font-style: italic; }
-        .history-amount.profit { color: var(--success-color); } .history-amount.loss { color: var(--danger-color); }
-        .delete-log { cursor: pointer; color: var(--secondary-text-color); transition: color 0.2s; padding: 0.5rem; font-size:1rem; }
-        @media (min-width: 1024px) { .two-thirds { grid-column: span 2; } .one-third { grid-column: span 1; } }
-        #app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .chart-summary { display: flex; justify-content: space-around; text-align: center; margin-bottom: 1.5rem; }
-        .summary-metric h4 { color: var(--secondary-text-color); font-size: 0.9rem; font-weight: 400; margin: 0 0 0.25rem 0; }
-        .summary-metric p { font-size: 1.4rem; font-weight: 600; margin: 0; }
-        
-        /* New/Updated Styles */
-        .smart-log-input { width: 100%; box-sizing: border-box; padding: 1rem; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 0.75rem; color: var(--primary-text-color); font-size: 1.1rem; font-family: var(--font-family); resize: vertical; min-height: 80px; margin-bottom: 0.5rem;}
-        .smart-log-input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(3, 218, 198, 0.3); outline: none;}
-        .input-helper-text { font-size: 0.8rem; color: var(--secondary-text-color); text-align: center; margin-bottom: 1rem; }
-        .thought-for-day { border-left: 3px solid var(--points-color); padding-left: 1rem; margin-top: 1.5rem; font-style: italic; color: var(--secondary-text-color); }
-        .ai-analysis-btn { background: none; border: 1px solid var(--points-color); color: var(--points-color); font-size: 0.9rem; padding: 0.5rem 1rem; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-        .modal-overlay.visible { opacity: 1; pointer-events: auto; }
-        .modal-content { background: var(--card-bg-color); border: 1px solid var(--border-color); padding: 2rem; border-radius: 1rem; max-width: 600px; width: 90%; text-align: left; transform: scale(0.9); transition: transform 0.3s ease; line-height: 1.8; }
-        .modal-content h3 { margin-top: 1rem; }
-        .modal-overlay.visible .modal-content { transform: scale(1); }
+        :root{--bg-color:#1a1a2e;--card-bg-color:#16213e;--primary-text-color:#e0e0e0;--secondary-text-color:#a0a0a0;--accent-color:#03dac6;--success-color:#4caf50;--danger-color:#f44336;--border-color:#0f3460;--font-family:'Poppins',sans-serif;--points-color:#ffc107;--streak-color:#ff5722}html{-webkit-tap-highlight-color:transparent}body{font-family:var(--font-family);background-color:var(--bg-color);color:var(--primary-text-color);margin:0;padding:1rem}.view{display:none}.view.active{display:block}.container{max-width:1200px;margin:0 auto;display:grid;gap:1rem;grid-template-columns:1fr}@media (min-width:1024px){.container{grid-template-columns:repeat(3,1fr)}}.card{background:var(--card-bg-color);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem}.card-header{margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--border-color)}.card-title{font-weight:600;font-size:1.3rem;margin:0}.btn{display:inline-block;padding:.9rem 1.5rem;border:none;border-radius:.75rem;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all .2s ease;text-align:center}.btn.full-width{display:block;width:100%}.btn:disabled{opacity:.5;cursor:not-allowed}.history-list{list-style:none;padding:0;margin:0;max-height:300px;overflow-y:auto}.history-item{display:flex;align-items:center;padding:.8rem 0;border-bottom:1px solid var(--border-color);gap:1rem}.history-details{flex-grow:1}.history-note{font-size:.8rem;color:var(--secondary-text-color);font-style:italic}.history-amount.profit{color:var(--success-color)}.history-amount.loss{color:var(--danger-color)}.delete-log{cursor:pointer;color:var(--secondary-text-color);transition:color .2s;padding:.5rem;font-size:1rem}@media (min-width:1024px){.two-thirds{grid-column:span 2}.one-third{grid-column:span 1}}#app-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}.chart-summary{display:flex;justify-content:space-around;text-align:center;margin-bottom:1.5rem}.summary-metric h4{color:var(--secondary-text-color);font-size:.9rem;font-weight:400;margin:0 0 .25rem 0}.summary-metric p{font-size:1.4rem;font-weight:600;margin:0}.thought-for-day{border-left:3px solid var(--points-color);padding-left:1rem;margin-top:1.5rem;font-style:italic;color:var(--secondary-text-color)}.ai-analysis-btn{background:none;border:1px solid var(--points-color);color:var(--points-color);font-size:.9rem;padding:.5rem 1rem}.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(5px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease}.modal-overlay.visible{opacity:1;pointer-events:auto}.modal-content{background:var(--card-bg-color);border:1px solid var(--border-color);padding:2rem;border-radius:1rem;max-width:600px;width:90%;text-align:left;transform:scale(.9);transition:transform .3s ease;line-height:1.8}.dashboard-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;text-align:center}.dashboard-metric h3{font-size:1rem;font-weight:400;color:var(--secondary-text-color);margin:0 0 .5rem 0}.dashboard-metric p{font-size:2.5rem;font-weight:700;margin:0;line-height:1.1}
+        .log-form-container{display:grid;grid-template-columns:1fr;gap:1.5rem;margin-bottom:1.5rem}@media (min-width:600px){.log-form-container{grid-template-columns:1fr 1fr}}.input-group{display:flex;flex-direction:column}.input-group label{font-size:.9rem;color:var(--secondary-text-color);margin-bottom:.5rem}.input-field-wrapper{display:flex;align-items:center;background-color:rgba(0,0,0,.3);border:1px solid var(--border-color);border-radius:.75rem;transition:all .2s ease-in-out}.input-field-wrapper:focus-within{border-color:var(--accent-color);box-shadow:0 0 0 3px rgba(3,218,198,.3)}.input-symbol{padding:0 1rem;font-size:1.2rem;font-weight:600;color:var(--secondary-text-color);border-right:1px solid var(--border-color)}.input-field-wrapper input{width:100%;padding:.9rem 1rem;border:none;background:transparent;outline:none;color:var(--primary-text-color);font-size:1.2rem;font-family:var(--font-family)}input.main-input{font-weight:700;font-size:1.5rem}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}input[type=number]{-moz-appearance:textfield}.cta-button{display:flex;align-items:center;justify-content:center;gap:.75rem}.ai-buttons-group{display:flex;flex-direction:column;gap:1rem;margin-top:1rem;}
     </style>
 </head>
 <body>
     <div id="loading-view" class="view active" style="text-align: center; padding-top: 5rem;"><p>Loading Profit Quest...</p></div>
-    <div id="auth-view" class="view"> <!-- Auth HTML will be injected by JS --> </div>
+    <div id="auth-view" class="view"> <!-- Auth HTML injected by JS --> </div>
     <div id="app-view" class="view">
         <header id="app-header"><div id="user-info"></div><button id="btn-sign-out" class="btn btn-danger" style="padding: 0.5rem 1rem;">Sign Out</button></header>
         <div class="container">
+            <div class="card full-width"> <div class="dashboard-metrics"><div class="dashboard-metric"><h3>Current Balance</h3><p id="dashboard-current-balance"></p></div><div class="dashboard-metric"><h3>Total Profit</h3><p id="dashboard-total-profit"></p></div><div class="dashboard-metric"><h3>Expected in 30 Days (30% Rule)</h3><p id="dashboard-projection" style="color: var(--accent-color)"></p></div></div> </div>
             <div class="card two-thirds">
-                <div class="card-header"><h2 class="card-title">AI Smart Log</h2></div>
+                <div class="card-header"><h2 class="card-title">Log Today's Trade</h2></div>
                 <form id="update-form">
-                    <textarea name="smart-log" class="smart-log-input" placeholder="Type your trade result here..." required></textarea>
-                    <p class="input-helper-text">e.g., "Made 300 profit on Nifty" or "Lost 150.50, bad entry"</p>
-                    <button type="submit" class="btn btn-primary full-width">Log Progress</button>
+                    <div class="log-form-container">
+                        <div class="input-group">
+                            <label for="profit-input">Profit/Loss</label>
+                            <div class="input-field-wrapper">
+                                <span class="input-symbol">₹</span>
+                                <input name="profit" id="profit-input" type="number" class="main-input" placeholder="0.00" required step="any">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="note-input">Note (optional)</label>
+                            <div class="input-field-wrapper">
+                                <span class="input-symbol">📝</span>
+                                <input name="note" id="note-input" type="text" placeholder="e.g. Nifty breakout">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary full-width cta-button">Log Progress</button>
                 </form>
             </div>
-            <div class="card one-third">
-                <div class="card-header"><h2 class="card-title">AI Assistant</h2></div>
-                <button id="ai-deep-dive-btn" class="btn ai-analysis-btn full-width">Request AI Deep Dive</button>
-                <div class="thought-for-day">
-                    <h4>Thought for the Day:</h4>
-                    <p id="ai-thought"></p>
-                </div>
-            </div>
-            <div class="card full-width"><div class="card-header"><h2 class="card-title">Account Growth Analysis</h2></div><div class="chart-summary"><div class="summary-metric"><h4>Total P/L</h4><p id="total-pl"></p></div><div class="summary-metric"><h4>All-Time High</h4><p id="ath-balance"></p></div><div class="summary-metric"><h4>Growth</h4><p id="growth-percentage"></p></div></div><div style="height:300px;"><canvas id="growth-chart"></canvas></div></div>
+            <div class="card one-third"><div class="card-header"><h2 class="card-title">AI Assistant</h2></div><div class="ai-buttons-group"><button id="ai-quick-insight-btn" class="btn ai-analysis-btn">Get Quick Insight</button><button id="ai-deep-dive-btn" class="btn ai-analysis-btn">Request Deep Dive</button></div><div class="thought-for-day"><h4>Thought for the Day:</h4><p id="ai-thought">Loading...</p></div></div>
+            <div class="card full-width"><div class="card-header"><h2 class="card-title">Account Growth Analysis</h2></div><div class="chart-summary"><div class="summary-metric"><h4>All-Time High</h4><p id="ath-balance"></p></div><div class="summary-metric"><h4>Growth %</h4><p id="growth-percentage"></p></div></div><div style="height:300px;"><canvas id="growth-chart"></canvas></div></div>
             <div class="card full-width"><div class="card-header"><h2 class="card-title">Transaction History</h2></div><ul id="history-list"></ul></div>
         </div>
     </div>
     <div id="ai-modal" class="modal-overlay"> <div class="modal-content"><h2 id="ai-modal-title" class="card-title" style="margin-bottom: 1rem;"></h2><div id="ai-analysis-result"></div><button id="ai-modal-close" class="btn btn-primary" style="margin-top: 1.5rem;">Close</button></div></div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // ---- 1. INJECT AUTH HTML & CONFIGURATION ---
     document.getElementById('auth-view').innerHTML = `<div class="card" style="max-width: 450px; margin: 3rem auto;"><div id="login-form-container"><h1 class="card-title">Welcome Back</h1><div class="error-message" id="login-error"></div><form id="login-form"><div class="form-group"><input name="email" type="email" class="form-input" placeholder="Email" required></div><div class="form-group"><input name="password" type="password" class="form-input" placeholder="Password" required></div><button type="submit" class="btn btn-primary full-width">Sign In</button></form><div style="text-align:center;margin:1rem 0;">or</div><button id="btn-google-signin" class="btn full-width" style="background-color:#fff; color:#333;">Continue with Google</button><p><a id="show-register-link" style="color:var(--accent-color); cursor:pointer; text-decoration:none; display:block; margin-top:1rem;text-align:center;">Don't have an account? Sign Up</a></p></div><div id="register-form-container" style="display:none;"><h1 class="card-title">Create Account</h1><div class="error-message" id="register-error"></div><form id="register-form"><div class="form-group"><input name="name" type="text" class="form-input" placeholder="Your Name" required></div><div class="form-group"><input name="email" type="email" class="form-input" placeholder="Email" required></div><div class="form-group"><input name="password" type="password" class="form-input" placeholder="Password" required></div><button type="submit" class="btn btn-primary full-width">Sign Up</button></form><p><a id="show-login-link" style="color:var(--accent-color); cursor:pointer; text-decoration:none; display:block; margin-top:1rem;text-align:center;">Already have an account? Sign In</a></p></div></div>`;
-    
-    // --- 1. FIREBASE & API KEY CONFIGURATION ---
     const firebaseConfig = {
   apiKey: "AIzaSyBLjuZ6sIHSLTUG6O5_UIzOs7jBQiSuaQs",
   authDomain: "dailyprofit-6b2e9.firebaseapp.com",
@@ -97,10 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
   appId: "1:259444914899:web:5af9b73b7397f21b223226",
   measurementId: "G-7PPM2BE5BY"
 };
-    
-    // =========================================================================
-    // == PASTE YOUR GEMINI API KEY HERE BY REPLACING 'AIzaSyDdp0THfzp04ORFoxLe6rkejyJGDRHf3N4'    ==
-    // =========================================================================
     const GEMINI_API_KEY = "AIzaSyDdp0THfzp04ORFoxLe6rkejyJGDRHf3N4";
 
     // --- 2. APP INITIALIZATION & STATE ---
@@ -109,31 +74,100 @@ document.addEventListener('DOMContentLoaded', () => {
     const STARTING_BALANCE = 1000;
     let state = {}, growthChart = null;
 
-    // --- 3. HELPER FUNCTIONS ---
+    // --- 3. HELPER & UTILITY FUNCTIONS ---
     const showView = (id) => { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); };
     const formatCurrency = (amount) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(amount || 0);
-    const callGemini = async (prompt) => {
-        if (!GEMINI_API_KEY || GEMINI_API_KEY === "AIzaSyDdp0THfzp04ORFoxLe6rkejyJGDRHf3N4") {
-            alert("Please use Ctrl+F to find 'AIzaSyDdp0THfzp04ORFoxLe6rkejyJGDRHf3N4' and replace it with your Gemini API key to use this feature.");
-            throw new Error("API Key not set.");
-        }
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    const callGemini = async (prompt) => { if (!GEMINI_API_KEY || GEMINI_API_KEY === "AIzaSyDdp0THfzp04ORFoxLe6rkejyJGDRHf3N4") { throw new Error("API Key not set."); } const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) }); if (!response.ok) throw new Error(`API Error: ${response.statusText}`); return (await response.json()).candidates[0].content.parts[0].text; };
+    
+    // --- 4. DATA HANDLING & RENDERING ---
+    const loadAndRenderApp=async user=>{try{const userRef=db.collection("users").doc(user.uid);let userDoc=await userRef.get();if(!userDoc.exists){const newUserData={displayName:user.displayName,email:user.email,balance:STARTING_BALANCE,points:0,streak:0,lastUpdate:null};await userRef.set(newUserData);state={...newUserData,history:[]}}else{const userData=userDoc.data(),transactionsSnap=await userRef.collection("transactions").orderBy("date","desc").get();state={...userData,history:transactionsSnap.docs.map(doc=>({id:doc.id,...doc.data()}))}}renderUI();showView("app-view");fetchThoughtForTheDay()}catch(error){console.error("Critical Error:",error),document.getElementById("loading-view").innerHTML='<p style="color:red">Error: Could not load data.</p>'}};
+    const renderUI=()=>{document.getElementById("user-info").textContent=`Welcome, ${state.displayName||"Trader"}`;document.getElementById("dashboard-current-balance").textContent=formatCurrency(state.balance);const totalProfit=state.balance-STARTING_BALANCE,totalProfitEl=document.getElementById("dashboard-total-profit");totalProfitEl.textContent=formatCurrency(totalProfit),totalProfitEl.style.color=totalProfit>=0?"var(--success-color)":"var(--danger-color)",document.getElementById("dashboard-projection").textContent=formatCurrency(state.balance*1.3**30),document.getElementById("history-list").innerHTML=state.history.length===0?"<li>No trades logged.</li>":state.history.map(item=>`<li class="history-item"><div class="history-details"><span class="history-amount ${item.amount>=0?"profit":"loss"}">${item.amount>=0?"+":""}${formatCurrency(item.amount)}</span> on ${item.date?item.date.toDate().toLocaleDateString("en-IN",{day:"numeric",month:"short"}):""}${item.note?`<div class="history-note">"${item.note}"</div>`:""}</div><span class="delete-log" data-id="${item.id}">🗑️</span></li>`).join(""),renderAccountGrowth()};
+    const renderAccountGrowth=()=>{const e=document.getElementById("growth-chart");let t=STARTING_BALANCE;const r=[...state.history].reverse().map(e=>(t+=e.amount,{balance:t,pnl:e.amount}));const o=state.balance-STARTING_BALANCE;document.getElementById("ath-balance").textContent=formatCurrency(Math.max(STARTING_BALANCE,...r.map(e=>e.balance)));const n=(o/STARTING_BALANCE*100),a=document.getElementById("growth-percentage");a.textContent=`${n.toFixed(1)}%`,a.style.color=n>=0?"var(--success-color)":"var(--danger-color)";growthChart&&growthChart.destroy(),growthChart=new Chart(e,{type:"line",data:{labels:["Start",...[...state.history].reverse().map(e=>e.date.toDate().toLocaleDateString("en-IN",{day:"numeric",month:"short"}))],datasets:[{label:"Balance",data:[STARTING_BALANCE,...r.map(e=>e.balance)],borderColor:"var(--accent-color)",fill:!1,tension:.1,pointBackgroundColor:["var(--secondary-text-color)",...r.map(e=>e.pnl>=0?"var(--success-color)":"var(--danger-color)")]}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1}},scales:{y:{ticks:{color:"var(--secondary-text-color)",callback:e=>"₹"+e/1e3+"k"}},x:{ticks:{color:"var(--secondary-text-color)"}}}}})};
+
+    // --- 5. EVENT HANDLERS & INITIALIZATION ---
+    const initEventListeners = () => {
+        // --- Authentication Listeners ---
+        document.getElementById('show-register-link').addEventListener('click',()=> { document.getElementById('login-form-container').style.display = 'none'; document.getElementById('register-form-container').style.display = 'block'; });
+        document.getElementById('show-login-link').addEventListener('click',()=> { document.getElementById('register-form-container').style.display = 'none'; document.getElementById('login-form-container').style.display = 'block'; });
+        document.getElementById('btn-google-signin').addEventListener('click', () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err => document.getElementById('login-error').textContent = err.message));
+        document.getElementById('btn-sign-out').addEventListener('click', () => auth.signOut());
+        document.getElementById('login-form').addEventListener('submit', (e) => { e.preventDefault(); auth.signInWithEmailAndPassword(e.target.email.value, e.target.password.value).catch(err => document.getElementById('login-error').textContent = err.message); });
+        document.getElementById('register-form').addEventListener('submit', async (e) => { e.preventDefault(); const name = e.target.name.value, email = e.target.email.value, password = e.target.password.value; try { const cred = await auth.createUserWithEmailAndPassword(email, password); await cred.user.updateProfile({ displayName: name }); await db.collection('users').doc(cred.user.uid).set({ displayName: name, email: email, balance: STARTING_BALANCE, points: 0, streak: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp(), lastUpdate: null }); } catch (err) { document.getElementById('register-error').textContent = err.message; }});
+
+        // --- Core App Listeners ---
+        document.getElementById('update-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const amount = parseFloat(e.target.profit.value);
+            const note = e.target.note.value;
+            if (isNaN(amount)) return;
+            try {
+                const userRef = db.collection('users').doc(auth.currentUser.uid);
+                await userRef.update({
+                    balance: firebase.firestore.FieldValue.increment(amount),
+                    points: firebase.firestore.FieldValue.increment(amount > 0 ? 25 : -50)
+                });
+                await userRef.collection('transactions').add({ amount, note, date: firebase.firestore.FieldValue.serverTimestamp() });
+                e.target.reset();
+                await loadAndRenderApp(auth.currentUser);
+            } catch(error) { alert("Could not save trade."); }
         });
-        if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
-        const result = await response.json();
-        return result.candidates[0].content.parts[0].text;
+        
+        document.getElementById('history-list').addEventListener('click', async (e) => {
+            if (!e.target.matches('.delete-log')) return;
+            const id = e.target.dataset.id;
+            const transaction = state.history.find(t => t.id === id);
+            if(transaction && confirm(`Delete transaction of ${formatCurrency(transaction.amount)}?`)){
+                const userRef = db.collection('users').doc(auth.currentUser.uid);
+                await userRef.update({ balance: firebase.firestore.FieldValue.increment(-transaction.amount), points: firebase.firestore.FieldValue.increment(-(transaction.amount > 0 ? 25 : -50)) });
+                await userRef.collection('transactions').doc(id).delete();
+                await loadAndRenderApp(auth.currentUser);
+            }
+        });
+
+        // --- AI Listeners ---
+        const handleAIRequest = async (button, prompt, title) => {
+            button.textContent = 'AI is thinking...'; button.disabled = true;
+            try {
+                const analysisText = await callGemini(prompt);
+                document.getElementById('ai-modal-title').textContent = title;
+                document.getElementById('ai-analysis-result').innerHTML = analysisText.replace(/\n/g, '<br>').replace(/### (.*?)/g, '<h3>$1</h3>');
+                document.getElementById('ai-modal').classList.add('visible');
+            } catch (error) { alert(`Could not get AI analysis: ${error.message}`);
+            } finally { button.textContent = title; button.disabled = false; }
+        };
+
+        document.getElementById('ai-quick-insight-btn').addEventListener('click', (e) => {
+            if(state.history.length < 2) return alert("Log at least two trades for an insight.");
+            const prompt = `Based on this trade history, provide a one-sentence "quick insight" about my performance. History: ${JSON.stringify(state.history.slice(0, 10).map(t => t.amount))}`;
+            handleAIRequest(e.target, prompt, "Quick Insight");
+        });
+        document.getElementById('ai-deep-dive-btn').addEventListener('click', (e) => {
+             if(state.history.length < 5) return alert("Log at least five trades for a deep dive.");
+            const prompt = `As a trading coach, analyze this history (oldest to newest): ${[...state.history].reverse().map(e=>`- P/L: ${formatCurrency(e.amount)}, Note: "${e.note}"`).join("\n")}. Give a deep analysis in markdown: Winning Patterns, Losing Patterns, and an Actionable Tip.`;
+            handleAIRequest(e.target, prompt, "Deep Dive Analysis");
+        });
+
+        document.getElementById('ai-modal-close').addEventListener('click', ()=>document.getElementById('ai-modal').classList.remove('visible'));
     };
+
+    const fetchThoughtForTheDay = async () => {
+        try {
+            const thought = await callGemini("Give a unique, concise thought about trading psychology.");
+            document.getElementById('ai-thought').textContent = `"${thought}"`;
+        } catch(e) { document.getElementById('ai-thought').textContent = '"Discipline over conviction."'; }
+    }
     
-    // --- 4. MAIN APP LOGIC & RENDERING --- (Unchanged and robust)
-    const loadAndRenderApp=async user=>{try{const userRef=db.collection("users").doc(user.uid);let userDoc=await userRef.get();if(userDoc.exists){const userData=userDoc.data(),transactionsSnap=await userRef.collection("transactions").orderBy("date","desc").get();state={...userData,history:transactionsSnap.docs.map(doc=>({id:doc.id,...doc.data()}))}}else{const newUserData={displayName:user.displayName,email:user.email,balance:STARTING_BALANCE,points:0,streak:0,unlockedAchievements:[],createdAt:firebase.firestore.FieldValue.serverTimestamp(),lastUpdate:null};await userRef.set(newUserData);state={...newUserData,history:[]}}renderUI();showView("app-view")}catch(error){document.getElementById("loading-view").innerHTML='<p style="color:red">Error: Could not load data.</p>';showView("loading-view")}};const renderUI=()=>{if(!state||!auth.currentUser)return;document.getElementById("user-info").textContent=`Welcome, ${state.displayName}`;document.getElementById("history-list").innerHTML=0===state.history.length?"<li>No trades logged.</li>":state.history.map(item=>`<li class="history-item"><div class="history-details"><span class="history-amount ${item.amount>=0?"profit":"loss"}">${item.amount>=0?"+":""}${formatCurrency(item.amount)}</span> on ${item.date?item.date.toDate().toLocaleDateString("en-IN",{day:"numeric",month:"short"}):""}${item.note?`<div class="history-note">"${item.note}"</div>`:""}</div><span class="delete-log" data-id="${item.id}">🗑️</span></li>`).join("");renderAccountGrowth()};const renderAccountGrowth=()=>{const chartCanvas=document.getElementById("growth-chart");let runningBalance=STARTING_BALANCE;const historyData=[...state.history].reverse().map(trade=>{const balanceAfter=runningBalance+trade.amount;runningBalance=balanceAfter;return{balance:balanceAfter,pnl:trade.amount}});const totalPl=state.balance-STARTING_BALANCE;const totalPlEl=document.getElementById("total-pl");totalPlEl.textContent=formatCurrency(totalPl);totalPlEl.style.color=totalPl>=0?"var(--success-color)":"var(--danger-color)";document.getElementById("ath-balance").textContent=formatCurrency(Math.max(STARTING_BALANCE,...historyData.map(d=>d.balance)));document.getElementById("growth-percentage").textContent=`${((totalPl/STARTING_BALANCE)*100).toFixed(1)}%`;if(growthChart)growthChart.destroy();growthChart=new Chart(chartCanvas,{type:"line",data:{labels:["Start",...[...state.history].reverse().map(t=>t.date.toDate().toLocaleDateString("en-IN",{day:"numeric",month:"short"}))],datasets:[{label:"Balance",data:[STARTING_BALANCE,...historyData.map(d=>d.balance)],borderColor:"var(--accent-color)",fill:false,tension:.1,pointBackgroundColor:["var(--secondary-text-color)",...historyData.map(d=>d.pnl>=0?"var(--success-color)":"var(--danger-color)")]}]},options:{responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1}},scales:{y:{ticks:{color:"var(--secondary-text-color)",callback:v=>"₹"+v/1e3+"k"}},x:{ticks:{color:"var(--secondary-text-color)"}}}}})};
-    
-    // --- 5. EVENT HANDLERS (with AI features) ---
-    const initEventListeners=()=>{const handleLogTrade=async e=>{e.preventDefault();const t=e.target["smart-log"].value;if(t.trim()){const r=e.target.querySelector("button");r.innerHTML="AI is thinking...",r.disabled=!0;try{const o=`Analyze this trader's log entry: "${t}". Extract the profit or loss amount and the descriptive note. Respond ONLY with a valid JSON object like {"amount": 350.50, "note": "Description here"} or {"amount": -200, "note": "Another description"}. Loss is negative.`,n=await callGemini(o),s=JSON.parse(n.replace(/```json|```/g,"").trim());if("number"!=typeof s.amount||"string"!=typeof s.note)throw new Error("AI did not return the correct data format.");const a=s.amount,i=!state.lastUpdate||!(state.lastUpdate.toDate().toDateString()===new Date().toDateString()),l={balance:state.balance+a,points:(state.points||0)+(a>0?25:-50),streak:a>0?(i?(state.streak||0)+1:state.streak):0,lastUpdate:firebase.firestore.FieldValue.serverTimestamp()},c=db.collection("users").doc(auth.currentUser.uid),d=c.collection("transactions").doc(),u=db.batch();u.update(c,l),u.set(d,{amount:a,note:s.note,date:firebase.firestore.FieldValue.serverTimestamp()}),await u.commit(),e.target.reset()}catch(e){console.error("Smart Log Error:",e),alert("The AI couldn't understand that. Please try rephrasing, like 'Made 500 profit' or 'lost 200'.")}finally{r.innerHTML="Log Progress",r.disabled=!1,await loadAndRenderApp(auth.currentUser)}}},handleDeepDive=async e=>{const t=e.target;t.textContent="AI is analyzing...",t.disabled=!0;try{const e=`You are an expert trading psychologist and performance coach. Analyze this full trading history from a user. Starting balance was ₹1000. History is oldest to newest:\n\n${[...state.history].reverse().map(e=>`- P/L: ${formatCurrency(e.amount)}, Note: "${e.note}"`).join("\n")}\n\nProvide a deep analysis in well-structured markdown. Cover these topics:\n### Winning Patterns\nWhat setups or conditions lead to profits?\n### Losing Patterns\nAre there common mistakes or conditions leading to losses?\n### Psychological Insights\nWhat is the trader's mindset based on their notes (e.g., confident, impatient, fearful)?\n### Actionable Tip\nSuggest a single, concrete thing they can focus on to improve.`,r=await callGemini(e);document.getElementById("ai-modal-title").textContent="Your Trading Deep Dive",document.getElementById("ai-analysis-result").innerHTML=r.replace(/\n/g,"<br>").replace(/### (.*?)/g,"<h3>$1</h3>"),document.getElementById("ai-modal").classList.add("visible")}catch(e){alert("Could not get AI analysis. Please try again.")}finally{t.textContent="Request AI Deep Dive",t.disabled=!1}};callGemini("Provide one unique, concise thought about trading psychology or discipline.").then(e=>document.getElementById("ai-thought").textContent=`"${e}"`).catch(e=>{document.getElementById("ai-thought").textContent='"Discipline is the bridge between goals and accomplishment."'}),document.getElementById("update-form").addEventListener("submit",handleLogTrade),document.getElementById("ai-deep-dive-btn").addEventListener("click",handleDeepDive);const handleDeleteTrade=async t=>{const r=state.history.find(e=>e.id===t);if(r&&confirm(`Delete transaction of ${formatCurrency(r.amount)}?`)){const o=db.collection("users").doc(auth.currentUser.uid),n={balance:state.balance-r.amount,points:state.points-(r.amount>0?25:-50)},s=o.collection("transactions").doc(t),l=db.batch();l.update(o,n),l.delete(s);try{await l.commit(),await loadAndRenderApp(auth.currentUser)}catch(e){alert("Could not delete trade.")}}};document.getElementById("show-register-link").addEventListener("click",()=>{document.getElementById("login-form-container").style.display="none",document.getElementById("register-form-container").style.display="block"}),document.getElementById("show-login-link").addEventListener("click",()=>{document.getElementById("register-form-container").style.display="none",document.getElementById("login-form-container").style.display="block"}),document.getElementById("btn-google-signin").addEventListener("click",()=>{auth.signInWithPopup(new firebase.auth.GoogleAuthProvider).catch(e=>document.getElementById("login-error").textContent=e.message)}),document.getElementById("btn-sign-out").addEventListener("click",()=>auth.signOut()),document.getElementById("login-form").addEventListener("submit",e=>{e.preventDefault(),auth.signInWithEmailAndPassword(e.target.email.value,e.target.password.value).catch(e=>document.getElementById("login-error").textContent=e.message)}),document.getElementById("register-form").addEventListener("submit",async e=>{e.preventDefault();try{const t=await auth.createUserWithEmailAndPassword(e.target.email.value,e.target.password.value);await t.user.updateProfile({displayName:e.target.name.value})}catch(e){document.getElementById("register-error").textContent=e.message}}),document.getElementById("history-list").addEventListener("click",e=>{e.target.matches(".delete-log")&&handleDeleteTrade(e.target.dataset.id)}),document.getElementById("ai-modal-close").addEventListener("click",()=>document.getElementById("ai-modal").classList.remove("visible"))};
-    
-    // Auth state listener kicks everything off
-    auth.onAuthStateChanged(user=>{user?loadAndRenderApp(user):(growthChart&&growthChart.destroy(),state={},showView("auth-view"))});
+    // Auth state listener to kick everything off
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            loadAndRenderApp(user);
+        } else {
+            if(growthChart) growthChart.destroy();
+            state = {};
+            showView('auth-view');
+        }
+    });
+
     initEventListeners();
 });
 </script>
