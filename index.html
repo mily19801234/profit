@@ -1,211 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Forex Growth Tracker</title>
-  <link rel="manifest" href="manifest.json" />
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Millionaire's Ledger</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- CSS is identical to the previous version -->
+    <style>
+        :root {
+            --primary-bg: #121212;
+            --secondary-bg: #1e1e1e;
+            --card-bg: #2a2a2a;
+            --primary-text: #e0e0e0;
+            --gold-accent: #D4AF37;
+            --green-positive: #28a745;
+            --red-negative: #dc3545;
+            --border-color: #444;
+            --other-month-text: #666;
+        }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--primary-bg); color: var(--primary-text); margin: 0; line-height: 1.6; }
+        .hidden { display: none !important; }
+        .auth-container { display: flex; justify-content: center; align-items: center; height: 100vh; background: url('https://images.unsplash.com/photo-1615799998603-7c6270a45d46?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80') no-repeat center center/cover; position: relative; }
+        .auth-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); }
+        .auth-box { background: var(--secondary-bg); padding: 40px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); text-align: center; width: 350px; z-index: 1; border: 1px solid var(--border-color); }
+        .logo { color: var(--gold-accent); font-weight: 700; font-size: 2.5rem; margin-bottom: 0; }
+        .tagline { font-size: 0.9rem; color: var(--primary-text); opacity: 0.7; margin-top: 5px; margin-bottom: 30px; }
+        .auth-box h2 { margin-bottom: 20px; color: white; }
+        .auth-box input { width: 100%; padding: 12px; margin-bottom: 15px; background: var(--primary-bg); border: 1px solid var(--border-color); border-radius: 5px; color: var(--primary-text); box-sizing: border-box; }
+        .auth-box button { width: 100%; padding: 12px; background: var(--gold-accent); border: none; border-radius: 5px; color: #000; font-weight: 600; cursor: pointer; transition: background-color 0.3s; }
+        .auth-switch a { color: var(--gold-accent); text-decoration: none; font-weight: 600; }
+        .app-container { padding: 20px; max-width: 1600px; margin: auto; }
+        header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+        .logo-small { background: var(--gold-accent); color: #000; border-radius: 8px; width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 1.2rem; }
+        .user-info { display: flex; align-items: center; gap: 20px; }
+        #user-email-display { max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #logout-button { background: var(--secondary-bg); color: var(--primary-text); border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+        main { margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        .grid-item { background: var(--card-bg); padding: 25px; border-radius: 10px; border: 1px solid var(--border-color); }
+        .grid-item h3 { margin-top: 0; font-weight: 300; text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.8rem; color: var(--gold-accent); }
+        .target-card strong, #ai-projection-text { color: var(--gold-accent); }
+        .progress-bar-container { background: var(--secondary-bg); height: 10px; border-radius: 5px; margin: 20px 0; }
+        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #b89b3c, var(--gold-accent)); border-radius: 5px; transition: width 0.5s ease-in-out; }
+        #transaction-form input, #transaction-form select, #transaction-form textarea { padding: 12px; background: var(--secondary-bg); border: 1px solid var(--border-color); border-radius: 5px; color: var(--primary-text); font-family: 'Poppins', sans-serif; }
+        #transaction-form textarea { resize: vertical; min-height: 60px; }
+        #transaction-form button { padding: 12px; background: var(--gold-accent); color: #000; font-weight: 600; border: none; border-radius: 5px; cursor: pointer; }
+        .history-card ul { list-style: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; }
+        .history-card li { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 5px; border-bottom: 1px solid var(--border-color); }
+        .transaction-info { flex-grow: 1; }
+        .transaction-desc { font-weight: 500; }
+        .transaction-note { font-size: 0.8rem; color: #aaa; margin-top: 4px; display: block; }
+        .transaction-amount { white-space: nowrap; margin-left: 10px; text-align: right; }
+        .history-positive { color: var(--green-positive); }
+        .history-negative { color: var(--red-negative); }
+        .delete-btn { background: none; border: none; color: #777; cursor: pointer; font-size: 1.1rem; padding: 0 0 0 10px; }
+        #daily-target-input { width: 120px; padding: 5px 8px; border: 1px solid var(--border-color); border-radius: 5px; font-size: 1rem; text-align: right; background: var(--secondary-bg); color: var(--primary-text); }
+        .target-setup { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .target-stats p { margin: 8px 0; display: flex; justify-content: space-between; }
+        .target-stats p strong { color: var(--gold-accent); }
+        .target-stats p .deficit { color: var(--red-negative); }
+        .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
+        .chart-wrapper { text-align: center; }
+        .chart-wrapper h4 { margin-top: 10px; font-weight: 500; color: var(--primary-text); }
+        .calendar-card { grid-column: 1 / -1; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .calendar-nav button { background: var(--secondary-bg); color: var(--primary-text); border: 1px solid var(--border-color); padding: 5px 12px; border-radius: 5px; cursor: pointer; }
+        .calendar-header h2 { margin: 0; font-size: 1.5rem; color: var(--gold-accent); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .calendar-day-name { text-align: center; font-weight: 600; color: #aaa; font-size: 0.9rem; padding-bottom: 10px; }
+        .calendar-day { border: 1px solid var(--border-color); border-radius: 5px; min-height: 100px; padding: 8px; font-size: 0.9rem; }
+        .calendar-day.other-month .day-number { color: var(--other-month-text); }
+        .calendar-day.profit { background-color: rgba(40, 167, 69, 0.1); border-color: rgba(40, 167, 69, 0.5); }
+        .calendar-day.loss { background-color: rgba(220, 53, 69, 0.1); border-color: rgba(220, 53, 69, 0.5); }
+        .day-number { font-weight: 600; color: var(--primary-text); }
+        .day-content { margin-top: 5px; }
+        .day-content .amount { font-weight: 600; font-size: 1rem; }
+        .day-content .amount.positive { color: var(--green-positive); }
+        .day-content .amount.negative { color: var(--red-negative); }
+        .day-content .trades { font-size: 0.8rem; color: #aaa; }
+        @media (max-width: 768px) {
+            .app-container { padding: 10px; }
+            main { grid-template-columns: 1fr; }
+            .charts-container { grid-template-columns: 1fr; gap: 40px; }
+            .grid-item { padding: 20px; }
+            .calendar-grid { gap: 3px; }
+            .calendar-day { min-height: 80px; padding: 5px; font-size: 0.8rem; }
+            .day-content .amount { font-size: 0.9rem; }
+            .day-content .trades { font-size: 0.7rem; }
+        }
+        @media (max-width: 480px) { .auth-box { width: 90%; padding: 25px; } .logo { font-size: 2rem; } header .user-info #user-email-display { display: none; } }
+    </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-6">
+<body>
+    <div id="auth-container" class="auth-container"><div class="auth-box"><h1 class="logo">Millionaire's Ledger</h1><p class="tagline">Your Path to Seven Figures</p><div id="login-view"><h2>Login</h2><input type="email" id="login-email" placeholder="Email"><input type="password" id="login-password" placeholder="Password"><button id="login-button">Sign In</button><p class="auth-switch">Don't have an account? <a href="#" id="show-signup">Sign Up</a></p></div><div id="signup-view" class="hidden"><h2>Sign Up</h2><input type="email" id="signup-email" placeholder="Email"><input type="password" id="signup-password" placeholder="Password"><button id="signup-button">Create Account</button><p class="auth-switch">Already have an account? <a href="#" id="show-login">Login</a></p></div><p id="auth-error" class="error-message"></p></div></div>
+    <div id="app-container" class="app-container hidden"><header><h1 class="logo-small">ML</h1><div class="user-info"><span id="user-email-display"></span><button id="logout-button">Logout</button></div></header><main><section class="grid-item target-card"><h3>THE GOAL: $1,000,000</h3><div class="progress-bar-container"><div id="progress-bar" class="progress-bar"></div></div><p>Current Balance: <strong id="current-balance">$0.00</strong></p><p>Est. Time to Goal: <strong id="ai-projection-text">--</strong></p></section><section class="grid-item daily-target-card"><h3>Daily Earning Target</h3><div class="target-setup"><span>Target (₹):</span><input type="number" id="daily-target-input" value="5000"></div><div class="target-stats"><p>Carried Over Deficit: <strong id="carried-deficit" class="deficit">₹0</strong></p><p>Today's Target: <strong id="today-target">₹5,000</strong></p><p>Today's Earnings: <strong id="today-earnings">₹0</strong></p></div></section><section class="grid-item transaction-card"><h3>Log a Transaction</h3><form id="transaction-form"><input type="text" id="transaction-description" placeholder="Description (e.g., Salary)" required><input type="number" id="transaction-amount" placeholder="Amount (₹)" required><textarea id="transaction-note" placeholder="Optional notes..."></textarea><select id="transaction-type"><option value="earning">Earning (+)</option><option value="expense">Expense (-)</option></select><button type="submit">Add Log</button></form></section><section class="grid-item history-card"><h3>Recent History</h3><ul id="transaction-history"></ul></section><section class="grid-item breakdown-card" style="grid-column: 1 / -1;"><h3>Financial Breakdown</h3><div class="charts-container"><div class="chart-wrapper"><canvas id="earnings-chart"></canvas><h4>Income Sources</h4></div><div class="chart-wrapper"><canvas id="expenses-chart"></canvas><h4>Expense Categories</h4></div></div></section><section class="grid-item calendar-card"><div class="calendar-header"><div class="calendar-nav"><button id="prev-month-btn"><</button><button id="next-month-btn">></button></div><h2 id="calendar-month-year">Month Year</h2></div><div class="calendar-grid" id="calendar-grid"></div></section></main></div>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyBLjuZ6sIHSLTUG6O5_UIzOs7jBQiSuaQs", authDomain: "dailyprofit-6b2e9.firebaseapp.com", projectId: "dailyprofit-6b2e9", storageBucket: "dailyprofit-6b2e9.firebasestorage.app", messagingSenderId: "259444914899", appId: "1:259444914899:web:5af9b73b7397f21b223226" };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        document.addEventListener('DOMContentLoaded', () => {
+            const authContainer = document.getElementById('auth-container'), appContainer = document.getElementById('app-container'), loginView = document.getElementById('login-view'), signupView = document.getElementById('signup-view'), showSignup = document.getElementById('show-signup'), showLogin = document.getElementById('show-login'), authError = document.getElementById('auth-error'), loginButton = document.getElementById('login-button'), signupButton = document.getElementById('signup-button'), logoutButton = document.getElementById('logout-button'), userEmailDisplay = document.getElementById('user-email-display'), progressBar = document.getElementById('progress-bar'), currentBalanceEl = document.getElementById('current-balance'), aiProjectionText = document.getElementById('ai-projection-text'), transactionHistoryList = document.getElementById('transaction-history'), transactionForm = document.getElementById('transaction-form'), calendarGrid = document.getElementById('calendar-grid'), calendarMonthYear = document.getElementById('calendar-month-year'), prevMonthBtn = document.getElementById('prev-month-btn'), nextMonthBtn = document.getElementById('next-month-btn'), dailyTargetInput = document.getElementById('daily-target-input'), carriedDeficitEl = document.getElementById('carried-deficit'), todayTargetEl = document.getElementById('today-target'), todayEarningsEl = document.getElementById('today-earnings'), earningsChartCtx = document.getElementById('earnings-chart'), expensesChartCtx = document.getElementById('expenses-chart');
+            const USD_TARGET = 1000000; const INR_TO_USD_RATE = 83.3;
+            let currentUser, currentTransactions = [], userSettings = { dailyTarget: 5000 };
+            let displayedDate = new Date(); let earningsChart, expensesChart;
+            showSignup.addEventListener('click', e => { e.preventDefault(); loginView.classList.add('hidden'); signupView.classList.remove('hidden'); authError.textContent = ''; });
+            showLogin.addEventListener('click', e => { e.preventDefault(); signupView.classList.add('hidden'); loginView.classList.remove('hidden'); authError.textContent = ''; });
+            signupButton.addEventListener('click', () => { auth.createUserWithEmailAndPassword(document.getElementById('signup-email').value, document.getElementById('signup-password').value).catch(e => authError.textContent = e.message); });
+            loginButton.addEventListener('click', () => { auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value).catch(e => authError.textContent = e.message); });
+            logoutButton.addEventListener('click', () => auth.signOut());
+            auth.onAuthStateChanged(user => { if (user) { currentUser = user; authContainer.classList.add('hidden'); appContainer.classList.remove('hidden'); userEmailDisplay.textContent = user.email; loadUserData(); } else { currentUser = null; appContainer.classList.add('hidden'); authContainer.classList.remove('hidden'); } });
+            function loadUserData() { if (!currentUser) return; db.collection('users').doc(currentUser.uid).onSnapshot(doc => { if (doc.exists) { userSettings = { ...userSettings, ...doc.data() }; dailyTargetInput.value = userSettings.dailyTarget; } loadTransactions(); }); }
+            function loadTransactions() { db.collection('users').doc(currentUser.uid).collection('transactions').orderBy('date', 'desc').onSnapshot(snapshot => { currentTransactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); updateAllUI(currentTransactions); }); }
+            window.deleteTransaction = (id) => { if (confirm('Are you sure?')) { db.collection('users').doc(currentUser.uid).collection('transactions').doc(id).delete(); } }
+            transactionForm.addEventListener('submit', (e) => { e.preventDefault(); const description = document.getElementById('transaction-description').value, amount = parseFloat(document.getElementById('transaction-amount').value), type = document.getElementById('transaction-type').value, note = document.getElementById('transaction-note').value; if (description && amount > 0) { db.collection('users').doc(currentUser.uid).collection('transactions').add({ description, amount, type, note, date: firebase.firestore.FieldValue.serverTimestamp() }).then(() => transactionForm.reset()); } });
+            dailyTargetInput.addEventListener('change', () => { const newTarget = parseFloat(dailyTargetInput.value) || 0; userSettings.dailyTarget = newTarget; db.collection('users').doc(currentUser.uid).set({ dailyTarget: newTarget }, { merge: true }); });
+            function updateAllUI(transactions) { const totalInr = transactions.reduce((acc, t) => acc + (t.type === 'earning' ? t.amount : -t.amount), 0); const totalUsd = totalInr / INR_TO_USD_RATE; currentBalanceEl.textContent = `$${totalUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`; progressBar.style.width = `${Math.min((totalUsd / USD_TARGET) * 100, 100)}%`; updateHistoryList(transactions.slice(0, 15)); renderCalendar(displayedDate, transactions); updateDailyTarget(transactions); updatePieCharts(transactions); getGeminiProjection(transactions); }
+            function updateHistoryList(transactions) { transactionHistoryList.innerHTML = transactions.length === 0 ? '<li>No transactions yet.</li>' : transactions.map(t => `<li class="transaction-item"><div class="transaction-info"><span class="transaction-desc">${t.description}</span>${t.note ? `<small class="transaction-note">${t.note}</small>` : ''}</div><div class="transaction-amount"><span class="${t.type === 'earning' ? 'history-positive' : 'history-negative'}">${t.type === 'earning' ? '+' : '-'}₹${t.amount.toLocaleString('en-IN')}</span><button class="delete-btn" onclick="deleteTransaction('${t.id}')">×</button></div></li>`).join(''); }
+            function renderCalendar(date, transactions) {
+                calendarGrid.innerHTML = ''; const year = date.getFullYear(); const month = date.getMonth();
+                calendarMonthYear.textContent = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                const dailyData = {};
+                transactions.forEach(t => { if (t.date) { const d = t.date.toDate(); const dateStr = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; if (!dailyData[dateStr]) dailyData[dateStr] = { net: 0, count: 0 }; dailyData[dateStr].net += t.type === 'earning' ? t.amount : -t.amount; dailyData[dateStr].count++; } });
+                const firstDayOfMonth = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate(); const daysInPrevMonth = new Date(year, month, 0).getDate();
+                const isMobile = window.innerWidth <= 768; const dayNames = isMobile ? ['S', 'M', 'T', 'W', 'T', 'F', 'S'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                calendarGrid.innerHTML = dayNames.map(name => `<div class="calendar-day-name">${name}</div>`).join('');
+                let cellCount = 0;
+                for (let i = firstDayOfMonth; i > 0; i--) { const dayNum = daysInPrevMonth - i + 1; calendarGrid.innerHTML += `<div class="calendar-day other-month"><div class="day-number">${dayNum}</div></div>`; cellCount++; }
+                for (let i = 1; i <= daysInMonth; i++) { const dayStr = `${year}-${month + 1}-${i}`; const dayData = dailyData[dayStr]; const dayDiv = document.createElement('div'); dayDiv.classList.add('calendar-day'); let contentHTML = `<div class="day-number">${i}</div>`; if (dayData) { dayDiv.classList.add(dayData.net >= 0 ? 'profit' : 'loss'); contentHTML += `<div class="day-content"><div class="amount ${dayData.net >= 0 ? 'positive' : 'negative'}">₹${dayData.net.toLocaleString('en-IN')}</div><div class="trades">${dayData.count} log${dayData.count > 1 ? 's' : ''}</div></div>`; } dayDiv.innerHTML = contentHTML; calendarGrid.appendChild(dayDiv); cellCount++; }
+                let dayNum = 1; while (cellCount % 7 !== 0) { calendarGrid.innerHTML += `<div class="calendar-day other-month"><div class="day-number">${dayNum++}</div></div>`; cellCount++; }
+            }
+            prevMonthBtn.addEventListener('click', () => { displayedDate.setMonth(displayedDate.getMonth() - 1); renderCalendar(displayedDate, currentTransactions); });
+            nextMonthBtn.addEventListener('click', () => { displayedDate.setMonth(displayedDate.getMonth() + 1); renderCalendar(displayedDate, currentTransactions); });
+            function updateDailyTarget(transactions) { if (!userSettings.dailyTarget) return; const dailyEarnings = {}; transactions.filter(t => t.type === 'earning' && t.date).forEach(t => { const dateStr = t.date.toDate().toISOString().split('T')[0]; if (!dailyEarnings[dateStr]) dailyEarnings[dateStr] = 0; dailyEarnings[dateStr] += t.amount; }); let firstTxDate = transactions.length > 0 ? new Date(transactions[transactions.length - 1].date.toDate()) : new Date(); firstTxDate.setHours(0,0,0,0); const today = new Date(); today.setHours(0,0,0,0); let deficit = 0; for (let d = firstTxDate; d < today; d.setDate(d.getDate() + 1)) { const dateStr = d.toISOString().split('T')[0]; const targetForDay = userSettings.dailyTarget + deficit; const earnedThatDay = dailyEarnings[dateStr] || 0; deficit = Math.max(0, targetForDay - earnedThatDay); } const todayStr = today.toISOString().split('T')[0]; const todayTarget = userSettings.dailyTarget + deficit; const todayEarned = dailyEarnings[todayStr] || 0; carriedDeficitEl.textContent = `₹${deficit.toLocaleString('en-IN')}`; todayTargetEl.textContent = `₹${todayTarget.toLocaleString('en-IN')}`; todayEarningsEl.textContent = `₹${todayEarned.toLocaleString('en-IN')}`; }
+            function updatePieCharts(transactions) { const earningsData = transactions.filter(t => t.type === 'earning').reduce((acc, t) => { acc[t.description] = (acc[t.description] || 0) + t.amount; return acc; }, {}); const expensesData = transactions.filter(t => t.type === 'expense').reduce((acc, t) => { acc[t.description] = (acc[t.description] || 0) + t.amount; return acc; }, {}); if (earningsChart) earningsChart.destroy(); if (expensesChart) expensesChart.destroy(); const chartOptions = { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#e0e0e0', font: { size: 10 } } } } }; const pieColors = ['#D4AF37', '#6a11cb', '#34e89e', '#ff8008', '#f7b733', '#e52d27', '#be93c5']; earningsChart = new Chart(earningsChartCtx, { type: 'pie', data: { labels: Object.keys(earningsData), datasets: [{ data: Object.values(earningsData), backgroundColor: pieColors, borderColor: '#2a2a2a' }] }, options: chartOptions }); expensesChart = new Chart(expensesChartCtx, { type: 'pie', data: { labels: Object.keys(expensesData), datasets: [{ data: Object.values(expensesData), backgroundColor: pieColors, borderColor: '#2a2a2a' }] }, options: chartOptions }); }
+            function getGeminiProjection(transactions) { if (transactions.length < 2) { aiProjectionText.textContent = "Not enough data."; return; } const firstDate = transactions[transactions.length - 1].date.toDate(); const days = Math.max(1, (new Date() - firstDate) / (1000 * 60 * 60 * 24)); const totalInr = transactions.reduce((acc, t) => acc + (t.type === 'earning' ? t.amount : -t.amount), 0); const dailySavingInr = totalInr / days; if (dailySavingInr <= 0) { aiProjectionText.textContent = "Indefinite"; return; } const remainingUsd = USD_TARGET - (totalInr / INR_TO_USD_RATE); if (remainingUsd <= 0) { aiProjectionText.textContent = "Goal Achieved!"; return; } const daysToGoal = remainingUsd / (dailySavingInr / INR_TO_USD_RATE); const years = Math.floor(daysToGoal / 365); const months = Math.floor((daysToGoal % 365) / 30.44); aiProjectionText.textContent = `${years} years, ${months} months`; }
+            
+            // --- DEBOUNCE UTILITY ---
+            function debounce(func, delay = 250) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        func.apply(this, args);
+                    }, delay);
+                };
+            }
 
-<div class="max-w-lg w-full space-y-6">
-  <h1 class="text-3xl font-bold text-center mb-4">📈 Forex Growth Tracker</h1>
-
-  <!-- Auth -->
-  <div id="auth" class="bg-gray-800 p-6 rounded-lg shadow space-y-3">
-    <input id="email" type="email" placeholder="Email" class="w-full p-3 rounded bg-gray-700 border border-gray-600">
-    <input id="password" type="password" placeholder="Password" class="w-full p-3 rounded bg-gray-700 border border-gray-600">
-    <button onclick="signIn()" class="w-full bg-blue-600 py-3 rounded hover:bg-blue-700">Sign In / Register</button>
-    <button onclick="signOut()" class="w-full bg-red-600 py-3 rounded hover:bg-red-700">Sign Out</button>
-  </div>
-
-  <!-- Dashboard -->
-  <div id="dashboard" class="hidden space-y-6">
-
-    <!-- Stats -->
-    <div class="bg-gray-800 p-6 rounded-lg shadow space-y-2">
-      <h2 class="text-2xl font-semibold mb-2">💰 Account Summary</h2>
-      <p><strong>Starting Balance:</strong> ₹1000</p>
-      <p><strong>Current Balance:</strong> ₹<span id="currentBalance">1000</span></p>
-      <p><strong>Today's Target (+30%):</strong> ₹<span id="todaysTarget">1300</span></p>
-      <p><strong>Expected after 30 days:</strong> ₹<span id="expectedBalance">1238332</span></p>
-      <p><strong>Points:</strong> <span id="points">0</span></p>
-      <p><strong>Status:</strong> <span id="todayStatus" class="font-bold">Not completed</span></p>
-    </div>
-
-    <!-- Log Entry -->
-    <div class="bg-gray-800 p-6 rounded-lg shadow space-y-3">
-      <h2 class="text-xl mb-2">📒 Log New Trade</h2>
-      <input id="amount" type="number" placeholder="Profit (+) or Loss (-)" class="w-full p-3 rounded bg-gray-700">
-      <button onclick="addEntry()" class="w-full bg-green-600 py-3 rounded hover:bg-green-700">Add Entry</button>
-    </div>
-
-    <!-- Motivation -->
-    <div class="bg-gray-800 p-6 rounded-lg shadow space-y-3">
-      <h2 class="text-xl mb-2">🌟 Get Motivated</h2>
-      <button onclick="getMotivation()" class="w-full bg-purple-600 py-3 rounded hover:bg-purple-700">Inspire Me</button>
-      <p id="aiResponse" class="mt-3 text-gray-300"></p>
-    </div>
-
-    <!-- Graph -->
-    <div class="bg-gray-800 p-6 rounded-lg shadow">
-      <canvas id="balanceChart" height="200"></canvas>
-    </div>
-
-    <!-- Calendar Summary -->
-    <div class="bg-gray-800 p-6 rounded-lg shadow">
-      <h2 class="text-xl mb-4">📅 Daily Summary</h2>
-      <div id="calendar" class="grid grid-cols-3 gap-2"></div>
-    </div>
-
-    <!-- Log History -->
-    <div class="bg-gray-800 p-6 rounded-lg shadow">
-      <h2 class="text-xl mb-4">📝 Log History</h2>
-      <div id="logHistory"></div>
-    </div>
-
-  </div>
-</div>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCW1z29xfd-rGjgW3LMQKp2N8sc2gEOOp0",
-  authDomain: "ghrttr.firebaseapp.com",
-  projectId: "ghrttr",
-  storageBucket: "ghrttr.appspot.com",
-  messagingSenderId: "100657420020",
-  appId: "1:100657420020:web:466bc40d05a9807e17b0a1",
-  measurementId: "G-1Y7RR0WJGL"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-let userId = null;
-let balance = 1000;
-let points = 0;
-let entries = [];
-
-function signIn() {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  auth.signInWithEmailAndPassword(email, password)
-    .catch(() => auth.createUserWithEmailAndPassword(email, password));
-}
-function signOut() { auth.signOut(); }
-
-auth.onAuthStateChanged(user => {
-  if (user) {
-    userId = user.uid;
-    document.getElementById('dashboard').classList.remove('hidden');
-    document.getElementById('auth').classList.add('hidden');
-    loadData();
-  } else {
-    userId = null;
-    document.getElementById('dashboard').classList.add('hidden');
-    document.getElementById('auth').classList.remove('hidden');
-  }
-});
-
-async function loadData() {
-  const doc = await db.collection('users').doc(userId).get();
-  if (doc.exists) {
-    const data = doc.data();
-    balance = data.balance || 1000;
-    points = data.points || 0;
-    entries = data.entries || [];
-  }
-  updateUI();
-}
-
-async function addEntry() {
-  const amt = parseFloat(document.getElementById('amount').value);
-  if (isNaN(amt)) return;
-  balance += amt;
-  points += amt > 0 ? 10 : -5;
-  entries.push({ date: new Date().toISOString().split('T')[0], amount: amt });
-  await db.collection('users').doc(userId).set({ balance, points, entries });
-  document.getElementById('amount').value = '';
-  updateUI();
-}
-
-function updateUI() {
-  const todayDate = new Date().toISOString().split('T')[0];
-  const todaySum = entries.filter(e => e.date === todayDate)
-                          .reduce((acc, e) => acc + e.amount, 0);
-
-  const todaysTarget = balance / (1 + todaySum / balance) * 1.3;
-  const achieved = balance >= todaysTarget;
-
-  document.getElementById('currentBalance').textContent = balance.toFixed(2);
-  document.getElementById('todaysTarget').textContent = (balance * 1.3).toFixed(2);
-  document.getElementById('expectedBalance').textContent = (balance * Math.pow(1.3,30)).toFixed(2);
-  document.getElementById('points').textContent = points;
-  document.getElementById('todayStatus').textContent = achieved ? "Completed ✅" : "Not completed";
-
-  // Calendar summary
-  const calendarDiv = document.getElementById('calendar');
-  calendarDiv.innerHTML = '';
-  const daily = {};
-  entries.forEach(e => daily[e.date] = (daily[e.date]||0)+e.amount);
-  Object.keys(daily).sort().forEach(date => {
-    const amt = daily[date];
-    calendarDiv.innerHTML += `<div class="p-2 rounded text-center ${amt>=0?'bg-green-600':'bg-red-600'}">
-      ${date}<br/>₹${amt.toFixed(2)}
-    </div>`;
-  });
-
-  // Graph
-  const ctx = document.getElementById('balanceChart').getContext('2d');
-  if (window.chartInstance) window.chartInstance.destroy();
-  const balancesOverTime = [];
-  let tempBal = 1000;
-  entries.forEach(e => { tempBal += e.amount; balancesOverTime.push(tempBal); });
-  window.chartInstance = new Chart(ctx, {
-    type: 'line',
-    data: { labels: balancesOverTime.map((_,i)=>i+1), datasets: [{
-      label:'Balance', data: balancesOverTime, borderColor:'lime', tension:0.3
-    }]},
-    options: {scales: {x:{ticks:{color:'white'}},y:{ticks:{color:'white'}}},plugins:{legend:{labels:{color:'white'}}}}
-  });
-
-  // Log history
-  const logDiv = document.getElementById('logHistory');
-  logDiv.innerHTML = '';
-  entries.slice().reverse().forEach((e,i) => {
-    logDiv.innerHTML += `<div class="p-2 mb-1 bg-gray-700 rounded flex justify-between">
-      <span>${e.date}: ₹${e.amount.toFixed(2)}</span>
-      <button onclick="deleteEntry(${entries.length-1-i})" class="bg-red-600 px-2 rounded">X</button>
-    </div>`;
-  });
-}
-
-async function deleteEntry(index) {
-  const removed = entries.splice(index,1)[0];
-  balance -= removed.amount;
-  points -= removed.amount > 0 ? 10 : -5;
-  await db.collection('users').doc(userId).set({ balance, points, entries });
-  updateUI();
-}
-
-// Gemini just for motivation
-async function getMotivation() {
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyDdp0THfzp04ORFoxLe6rkejyJGDRHf3N4`, {
-    method: "POST",
-    headers: { "Content-Type":"application/json" },
-    body: JSON.stringify({ contents: [{ parts:[{text:"Give me a short motivational message to keep going with my forex trading goals."}] }]})
-  });
-  const data = await res.json();
-  document.getElementById('aiResponse').textContent = data.candidates?.[0]?.content?.parts?.[0]?.text || "Stay strong!";
-}
-
-// PWA
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-</script>
+            // --- RESIZE EVENT LISTENER FOR RESPONSIVE CALENDAR ---
+            window.addEventListener('resize', debounce(() => {
+                if(currentUser) { // Only re-render if a user is logged in
+                    renderCalendar(displayedDate, currentTransactions);
+                }
+            }));
+        });
+    </script>
 </body>
 </html>
